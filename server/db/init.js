@@ -31,6 +31,9 @@ db.serialize(() => {
   stmt.run(2, 'Jane Smith', 'jane@example.com', '112', 'female', 120);
   stmt.run(3, 'Bob Wilson', 'bob@example.com', '211', 'male', 90);
   stmt.finalize();
+
+  "UPDATE CUSTOMER"
+  
 });
 
 // Close the database
