@@ -14,7 +14,7 @@ app.get('/test', (req, res) => {
 });
 
 app.get('/Customer', (req, res) => {
-  const db = new sqlite3.Database('./app_database.db');
+  const db = new sqlite3.Database('./db/app_database.db');
   
   db.all("SELECT * FROM Customer", (err, rows) => {
     if (err) {
