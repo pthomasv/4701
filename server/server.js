@@ -29,6 +29,13 @@ app.get('/Customer', (req, res) => {
   db.close();
 });
 
+
+function redirectCustomer(){
+  window.location.href = "customer.html";
+}
+
+
+
 app.listen(3000, () => {
     console.log("Server started on port 3000")
 })
