@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+     <script>
+            async function myFunction() {
+                const response = await fetch('http://localhost:3000/Customer')
+                const myJson = await response.json();
+                console.log(myJson)   
+            }
+
+            function redirectCustomer(){
+                window.location.href = "customer.html";
+            }
+
+            function redirectEmployee(){
+                window.location.href = "employee.html";
+            }
+
+    </script>
+    <div><b>BuyGM.com</b></div>
+    <button onclick="redirectEmployee()">Employeer Login</button>
+    <button onclick="redirectCustomer()">Customer Login</button>
+    
+</head>
+<body>
+    
+</body>
+</html>
