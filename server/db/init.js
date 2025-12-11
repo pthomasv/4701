@@ -13,27 +13,27 @@ db.serialize(() => {
   
   db.run("CREATE TABLE IF NOT EXISTS Plant (plantID int, name varchar(256), address varchar(256), companyID int not null, primary key (plantID), foreign key (companyID) references Company);");
   
-  db.run("CREATE TABLE IF NOT EXISTS Customer (custID int, name varchar(256), address varchar(256), phone varchar(256), gender varchar(256), income int, primary key (custID));");
-  
-  db.run("CREATE TABLE IF NOT EXISTS Dealership (dealerID int, name varchar(256), address varchar(256), primary key (dealerID));");
-  
-  db.run("CREATE TABLE IF NOT EXISTS Vehicle (VIN int, model_name varchar(256), date_of_manufacture date, plantID int not null, brandID int not null, custID int, dealerID int, primary key (VIN), foreign key (plantID) references Plant, foreign key (brandID) references Brand, foreign key (custID) references Customer, foreign key (dealerID) references Dealership);");
-  
-  db.run("CREATE TABLE IF NOT EXISTS Options (color varchar(256), engine varchar(256), transmission varchar(256), VIN int, primary key (VIN), foreign key (VIN) references Vehicle);");
-  
   db.run("CREATE TABLE IF NOT EXISTS Provides (plantID int not null, supplyID int not null, primary key (plantID, supplyID), foreign key (plantID) references Plant, foreign key (supplyID) references Supplier);");
-  
-  db.run("CREATE TABLE IF NOT EXISTS Deals (deal date, custID int not null, dealerID int not null, VIN int not null, primary key (custID, dealerID, VIN, deal), foreign key (custID) references Customer, foreign key (dealerID) references Dealership, foreign key (VIN) references Vehicle);");
 
+  db.run("CREATE TABLE IF NOT EXISTS Vehicle (VIN int, model_name varchar(256), price int, plantID int not null, brandID int not null, dealerID int, primary key (VIN), foreign key (plantID) references Plant, foreign key (brandID) references Brand, foreign key (dealerID) references Dealership);");
+
+  db.run("CREATE TABLE IF NOT EXISTS Options (color varchar(256), engine varchar(256), transmission varchar(256), VIN int, primary key (VIN), foreign key (VIN) references Vehicle);");
+
+  db.run("CREATE TABLE IF NOT EXISTS SiteUser (userID int auto_increment, email varchar(256) unique not null, password varchar(256) not null, role char(4) not null, primary key (userID));");
+
+  db.run("CREATE TABLE IF NOT EXISTS Customer (userID int, name varchar(256), address varchar(256), phone varchar(256), gender varchar(256), income int, primary key (userID), foreign key (userID) references SiteUser);");
+
+  db.run("CREATE TABLE IF NOT EXISTS Employee (userID int, name varchar(256), dealerID int not null, primary key (userID), foreign key (userID) references SiteUser, foreign key (dealerID) references Dealership);");
+
+  db.run("CREATE TABLE IF NOT EXISTS Dealership (dealerID int, name varchar(256), address varchar(256), capacity int, primary key (dealerID));");
+  
+  db.run("CREATE TABLE IF NOT EXISTS Deals (dealID int auto_increment, date_of_deal date not null, bought_by int not null, sold_by int not null, VIN int not null, price int, primary key(dealID), foreign key (bought_by) references Customer(userID), foreign key (sold_by) references Dealership(dealerID), foreign key (VIN) references Vehicle);");
   // Starter Customer
-  const stmt = db.prepare("INSERT INTO Customer VALUES (?, ?, ?, ?, ?, ?)");
-  stmt.run(1, 'John Doe', 'john@example.com', '911', 'male', 100);
-  stmt.run(2, 'Jane Smith', 'jane@example.com', '112', 'female', 120);
-  stmt.run(3, 'Bob Wilson', 'bob@example.com', '211', 'male', 90);
-  stmt.finalize();
-
-  "UPDATE CUSTOMER"
-  
+  // const stmt = db.prepare("INSERT INTO Customer VALUES (?, ?, ?, ?, ?, ?)");
+  // stmt.run(1, 'John Doe', 'john@example.com', '911', 'male', 100);
+  // stmt.run(2, 'Jane Smith', 'jane@example.com', '112', 'female', 120);
+  // stmt.run(3, 'Bob Wilson', 'bob@example.com', '211', 'male', 90);
+  // stmt.finalize();
 });
 
 // Close the database

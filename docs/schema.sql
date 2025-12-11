@@ -71,7 +71,7 @@ create table SiteUser (
 	password 			varchar(256) not null
 	role 					char(4) not null,
 	
-	primary key (userID),
+	primary key (userID)
 );
 
 create table Customer (
