@@ -1,5 +1,6 @@
 const express = require('express')
 const sqlite3 = require('sqlite3').verbose();
+const { insertCustomer } = require("./db/customer")
 const app = express()
 
 const cors = require("cors"); //imports cors
@@ -77,10 +78,37 @@ app.get('/Customer', (req, res) => {
 });
 
 
-function redirectCustomer(){
-  window.location.href = "customer.html";
-}
+app.post('/register', async (req, res) => {
+  const {
+    name = "",
+    email = "peter@gmail.com",
+    password = "",
+    address = "",
+    phone = "",
+    gender = "",
+    income = 0
+  } = req.body
 
+  try {
+    await insertCustomer(
+      name,
+      email,
+      password,
+      address,
+      phone,
+      gender,
+      income
+    )
+
+    res.status(201).json({ success: true })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({
+      success: false,
+      error: "Registration failed"
+    })
+  }
+})
 
 
 app.listen(3000, () => {
