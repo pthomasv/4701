@@ -9,12 +9,12 @@
     <title>Login</title>
     <div>
         <h2>Login</h2>
-        <form onsubmit="handleLogin()">
+        <form onsubmit="handleLogin(event)">
           <label>Email</label>
-          <input type="text" id="fieldEmail" required/>
+          <input type="email" id="fieldEmail" required/>
 
           <label>Password</label>
-          <input type="text" id="fieldPassword" required/>
+          <input type="password" id="fieldPassword" required/>
 
           <button type="submit">Login</button>
         </form>
