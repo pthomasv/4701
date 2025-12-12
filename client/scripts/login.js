@@ -1,8 +1,6 @@
 async function handleLogin(event){
   event.preventDefault()
 
-  console.log("asd")
-
   const email = document.getElementById("fieldEmail").value
   const password = document.getElementById("fieldPassword").value
 
@@ -17,6 +15,7 @@ async function handleLogin(event){
       body: JSON.stringify(data)
     })
     const result = await response.json()
+    // TODO (maybe): COMPLETE
     if (result.success) {
       localStorage.setItem('user')
     }

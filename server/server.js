@@ -11,7 +11,6 @@ app.use(express.json())
 
 app.get('/test', (req, res) => {
     res.json("hello world");
-  
 });
 
 /* Login endpoint*/
@@ -76,6 +75,27 @@ app.get('/Customer', (req, res) => {
   db.close();
 });
 
+app.get("/api/dealership/:id", (req, res) => {
+    const id = req.params.id;
+
+    const dealershipQuery =
+        "SELECT * FROM Dealership WHERE dealerID = ?";
+    const carsQuery =
+        "SELECT * FROM Cars WHERE dealerID = ?";
+
+    db.get(dealershipQuery, [id], (err, dealer) => {
+        if (err) return res.status(500).json({ error: err });
+
+        db.all(carsQuery, [id], (err, cars) => {
+            if (err) return res.status(500).json({ error: err });
+
+            res.json({
+                dealership: dealer,
+                cars: cars
+            });
+        });
+    });
+});
 
 function redirectCustomer(){
   window.location.href = "customer.html";
