@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="scripts/redirection.js"></script>
+    <link rel="stylesheet" href="./styles/landing.css">
     <script>
             async function myFunction() {
                 const response = await fetch('http://localhost:3000/login')
@@ -15,8 +16,14 @@
     </script>
 </head>
 <body>
-  <div><b>BuyGM.com</b></div>
-  <button onclick="redirectLogin()">Login</button>
-  <button onclick="redirectRegister()">Register</button>
+<div class="main logo" style="background-image: url('./styles/gm.png'); background-size: cover;">
+</div>
+
+    
+  </div>
+  <div class="main" style="padding: 10px;">
+    <button class="button-14"onclick="redirectLogin()">Login</button><br>
+    <button class="button-14"onclick="redirectRegister()">Register</button>
+  </div>
 </body>
 </html>
