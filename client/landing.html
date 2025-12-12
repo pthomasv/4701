@@ -7,7 +7,7 @@
     <script src="scripts/redirection.js"></script>
     <script>
             async function myFunction() {
-                const response = await fetch('http://localhost:3000/Customer')
+                const response = await fetch('http://localhost:3000/login')
                 const myJson = await response.json();
                 console.log(myJson)   
             }
@@ -15,6 +15,6 @@
 </head>
 <body>
   <div><b>BuyGM.com</b></div>
-  <button onclick="redirectLogin()">Login</button>
+  <button onclick="myFunction()">Login</button>
 </body>
 </html>
