@@ -77,6 +77,8 @@ app.get('/Customer', (req, res) => {
 });
 
 
+
+
 function redirectCustomer(){
   window.location.href = "customer.html";
 }
