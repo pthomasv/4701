@@ -130,6 +130,76 @@ app.post('/register', async (req, res) => {
   }
 })
 
+app.post('/purchase', (req, res) => {
+  console.log('=== Purchase Request ===');
+  console.log('Body:', req.body);
+  
+  const { VIN, userID, price } = req.body;
+  
+  if (!VIN || !userID || !price) {
+    console.log('Missing fields:', { VIN, userID, price });
+    return res.status(400).json({ success: false, message: "Missing required fields" });
+  }
+  
+  const db = new sqlite3.Database('./db/app_database.db', (err) => {
+    if (err) {
+      console.error('Database connection error:', err);
+      return res.status(500).json({ success: false, message: "Database connection failed" });
+    }
+  });
+  
+  db.get("SELECT dealerID FROM Vehicle WHERE VIN = ?", [VIN], (err, vehicle) => {
+    if (err) {
+      console.error('Query error:', err);
+      db.close();
+      return res.status(500).json({ success: false, message: "Database query failed: " + err.message });
+    }
+    
+    console.log('Vehicle found:', vehicle);
+    
+    if (!vehicle) {
+      db.close();
+      return res.status(404).json({ success: false, message: "Vehicle not found" });
+    }
+    
+    if (!vehicle.dealerID) {
+      db.close();
+      return res.status(400).json({ success: false, message: "Vehicle already sold" });
+    }
+    
+    const dealerID = vehicle.dealerID;
+    const today = new Date().toISOString().split('T')[0];
+    
+    console.log('Creating deal:', { today, userID, dealerID, VIN, price });
+    
+    db.run(
+      "INSERT INTO Deals (date_of_deal, bought_by, sold_by, VIN, price) VALUES (?, ?, ?, ?, ?)",
+      [today, userID, dealerID, VIN, price],
+      function(err) {
+        if (err) {
+          console.error('Insert deal error:', err);
+          db.close();
+          return res.status(500).json({ success: false, message: "Failed to create deal: " + err.message });
+        }
+        
+        console.log('Deal created, ID:', this.lastID);
+        
+        db.run("UPDATE Vehicle SET dealerID = NULL WHERE VIN = ?", [VIN], (err) => {
+          if (err) {
+            console.error('Update vehicle error:', err);
+            db.close();
+            return res.status(500).json({ success: false, message: "Failed to update vehicle: " + err.message });
+          }
+          
+          console.log('Purchase successful!');
+          res.json({ success: true, message: "Purchase successful", dealID: this.lastID });
+          db.close();
+        });
+      }
+    );
+  });
+});
+
 app.get("/home", (req, res) => {
     const db = new sqlite3.Database('./db/app_database.db')
     const dealershipsQuery = "SELECT dealerID, name, address FROM Dealership";

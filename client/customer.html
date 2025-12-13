@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,15 +9,78 @@
       if (localStorage.getItem('role') !== 'user') {
         window.location.href = '404.html'
       }
+
+      async function loadData() {
+        const res = await fetch("http://localhost:3000/home");
+        const data = await res.json();
+        
+        // Display dealerships with their cars
+        let html = "";
+        data.forEach(dealer => {
+          html += `<h3>${dealer.name}</h3>`;
+          html += `<p>${dealer.address}</p>`;
+          html += `<ul>`;
+          dealer.vehicles.forEach(car => {
+            html += `<li>
+              ${car.model_name} — $${car.price} 
+              <button onclick="purchase(${car.VIN}, '${car.model_name}', ${car.price})">Purchase</button>
+            </li>`;
+          });
+          html += `</ul><br>`;
+        });
+        document.getElementById("dealership-info").innerHTML = html;
+      }
+
+      async function purchase(vin, model, price) {
+        if (!confirm(`Purchase ${model} for ${price}?`)) {
+          return;
+        }
+        
+        try {
+          const userID = localStorage.getItem('userID');
+          
+          if (!userID) {
+            alert('Please log in first');
+            return;
+          }
+          
+          const res = await fetch("http://localhost:3000/purchase", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              VIN: vin, 
+              userID: parseInt(userID),
+              price: price
+            })
+          });
+          
+          // Check if response is ok
+          if (!res.ok) {
+            const text = await res.text();
+            console.error('Server response:', text);
+            alert('Purchase failed: Server error');
+            return;
+          }
+          
+          const result = await res.json();
+          
+          if (result.success) {
+            alert('Purchase successful!');
+            loadData(); // Reload to update inventory
+          } else {
+            alert('Purchase failed: ' + result.message);
+          }
+        } catch (error) {
+          alert('Error processing purchase: ' + error.message);
+          console.error(error);
+        }
+      }
+
+      window.onload = loadData;
     </script>
 </head>
 <body>
-    <h2>Dealership Information</h2>
+    <h2>Dealerships and Inventory</h2>
     <div id="dealership-info"></div>
-
-    <h2>Cars Available</h2>
-    <div id="car-list"></div>
-
-    <script src="scripts/customer2.js"></script>
 </body>
 </html>
