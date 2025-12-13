@@ -1,22 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <div>WELCOME TO THE HIMLYAYAS!</div>
-    <script>
-      if (localStorage.getItem('role') !== 'empl') {
-        window.location.href = '404.html'
-      }
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="scripts/modifyvehicle.js"></script>
+  <link rel="stylesheet" href="./styles/landing.css">
 </head>
+
 <body>
-    <div>
-        <form action="/" method="post">
-        <label for="fname">VIN</label>
-        <input type="text" id="fvin" name="fvin"><br><br>
-        </form>
+
+  <div class="forms-row">
+
+    <!-- ADD VEHICLE -->
+    <div class="form-box">
+      <h2>Add Vehicle</h2>
+      <form onsubmit="handleAdd(event)" class="form">
+
+        <label>Vehicle VIN</label>
+        <input type="text" id="addVin" required />
+
+        <label>Options</label>
+        <select id="fieldColor" required>
+          <option value="">Color</option>
+          <option value="black">Black</option>
+          <option value="white">White</option>
+          <option value="grey">Grey</option>
+          <option value="blue">Blue</option>
+          <option value="red">Red</option>
+        </select>
+
+        <select id="fieldEngine" required>
+          <option value="">Engine</option>
+          <option value="v6">V6</option>
+          <option value="v8">V8</option>
+          <option value="v12">V12</option>
+        </select>
+
+        <select id="fieldTransmission" required>
+          <option value="">Transmission</option>
+          <option value="manual">Manual</option>
+          <option value="automatic">Automatic</option>
+        </select>
+
+        <select id="fieldDealership" required>
+          <option value="Brand">Brand</option>
+          <option value="Gmc">GMC</option>
+          <option value="Cheverolet">Cheverolet</option>
+          <option value="Cadillac">Cadillac</option>
+          <option value="Buick">Buick</option>
+        </select>
+
+        <button type="submit">Add</button>
+      </form>
     </div>
+
+    <!-- DELETE VEHICLE -->
+    <div class="form-box">
+      <h2>Delete Vehicle</h2>
+      <form onsubmit="handleDelete(event)" class="form">
+
+        <label>Vehicle VIN</label>
+        <input type="text" id="deleteVin" required />
+
+        <button type="submit">Delete</button>
+      </form>
+    </div>
+
+    <!-- MODIFY VEHICLE -->
+    <div class="form-box">
+      <h2>Modify</h2>
+      <form onsubmit="handleModify(event)" class="form">
+
+        <label>Vehicle VIN</label>
+        <input type="text" id="modifyVin" required />
+        New Price<input type="text" id="modifyPrice" required />
+        <button type="submit">Update</button>
+      </form>
+    </div>
+
+  </div>
+
 </body>
 </html>
