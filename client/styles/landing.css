@@ -76,3 +76,13 @@ body {
   box-shadow: rgba(228, 121, 17, .5) 0 0 3px 2px;
   outline: 0;
 }
+
+.forms-row {
+  display: flex;
+  gap: 40px;           /* space between forms */
+  align-items: flex-start;
+}
+
+.form-box {
+  min-width: 250px;
+}
