@@ -17,11 +17,16 @@ async function handleLogin(event){
     const result = await response.json()
     // TODO (maybe): COMPLETE
     if (result.success) {
-      localStorage.setItem('user')
+      localStorage.setItem('userID', result.user.userID)
+      localStorage.setItem('role', result.user.role)
+      if (result.user.role === 'user'){
+        window.location.href = '../client/customer.html'
+      } else if (result.user.role == 'empl') {
+        window.location.href = '../client/employee.html'
+      }
+    } else {
+      alert("Login Failed: " + result.message)
     }
-
-
-
   } catch (error) {
     console.error('Login error:', error)
   }

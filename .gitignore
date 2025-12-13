@@ -1,4 +1,4 @@
 # --- Node Modules ---
 node_modules/
 .DS_Store
-server/app_database.db
+server/db/app_database.db

@@ -27,7 +27,13 @@ async function handleRegister(event) {
     })
 
     const result = await response.json()
-    console.log(result)
+    if (result.success) {
+      localStorage.setItem('userID', result.user.userID)
+      localStorage.setItem('role', result.user.role)
+      window.location.href = '../client/customer.html'
+    } else {
+      alert("Registration failed: " + result.error);
+    }
   } catch (err) {
     console.error("Register error:", err)
   }
