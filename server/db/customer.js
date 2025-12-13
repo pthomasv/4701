@@ -14,25 +14,24 @@ async function insertCustomer(name, email, password, address, phone, gender, inc
         [email, hash],
         function (err) {
           if (err) {
-            return reject(err)
+            reject(err)
           }
-
           const custID = this.lastID
-
           db.run(
             "INSERT INTO Customer (userID, name, address, phone, gender, income) VALUES (?, ?, ?, ?, ?, ?)",
             [custID, name, address, phone, gender, income],
             (err) => {
               if (err) {
-                return reject(err)
+                reject(err)
+              } else {
+                resolve(custID)
               }
-
-              resolve(custID)
             }
           )
         }
       )
     } catch (error) {
+      db.close()
       reject(error)
     }
   })

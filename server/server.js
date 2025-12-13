@@ -1,5 +1,6 @@
 const express = require('express')
 const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcrypt')
 const { insertCustomer } = require("./db/customer")
 const app = express()
 
@@ -15,50 +16,71 @@ app.get('/test', (req, res) => {
 });
 
 /* Login endpoint*/
-app.post('/login', (req, res) => {
-  const { email, password } = req.body
-  const db = new sqlite3.Database('./db/app_database.db')
-  db.get("SELECT * FROM User WHERE email = ? AND password = ?",
-    [email, password],
-    (err, u) => {
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  
+  const db = new sqlite3.Database('./db/app_database.db');
+  
+  db.get("SELECT userID, password, role FROM SiteUser WHERE email = ?",
+    [email],
+    async (err, u) => {
       if (err) {
-        res.status(500).json({ success: false, message: err.message })
-        db.close()
-        return
+        res.status(500).json({ success: false, message: err.message });
+        db.close();
+        return;
       }
       if (!u) {
-        res.status(401).json({ success: false, message: "Invalid login" })
-        db.close()
-        return
+        res.status(401).json({ success: false, message: "Invalid email or password" });
+        db.close();
+        return;
       }
-      if (u.role === "customer") {
-        db.get("SELECT * FROM Customer WHERE userID = ?",
-          [u.userID],
-          (err, c) => {
-            if (err) {
-              res.status(500).json({ success: false, message: err.message })
-            } else {
-              res.json({ success: true, user: {userID: u.userID, email: u.email, role: u.role, name: c.name, address: c.address, phone: c.phone }})
+      
+      try {
+        const isMatch = await bcrypt.compare(password, u.password);
+        
+        if (!isMatch) {
+          res.status(401).json({ success: false, message: "Invalid email or password" });
+          db.close();
+          return;
+        }
+        
+        // Password is correct, get role-specific data
+        if (u.role === "user") {
+          db.get("SELECT * FROM Customer WHERE userID = ?",
+            [u.userID],
+            (err, c) => {
+              if (err) {
+                res.status(500).json({ success: false, message: err.message });
+              } else {
+                res.json({ success: true, user: { userID: u.userID, email: email, role: u.role, name: c.name, address: c.address, phone: c.phone, gender: c.gender, income: c.income } });
+              }
+              db.close();
             }
-            db.close()
-          }
-        )
-      } else if (user.role === "employee") {
-        db.get("SELECT * FROM Employee WHERE userID = ?",
-          [u.userID],
-          (err, e) => {
-            if (err) {
-              res.status(500).json({ success: false, message: err.message })
-            } else {
-              res.json({ success: true, user: {userID: u.userID, email: u.email, role: u.role, name: e.name, dealerID: e.dealerID }})
+          );
+        } else if (u.role === "empl") {
+          db.get("SELECT * FROM Employee WHERE userID = ?",
+            [u.userID],
+            (err, e) => {
+              if (err) {
+                res.status(500).json({ success: false, message: err.message });
+              } else {
+                res.json({ success: true, user: { userID: u.userID, email: email, role: u.role, name: e.name, dealerID: e.dealerID } });
+              }
+              db.close();
             }
-            db.close()
-          }
-        )
+          );
+        } else {
+          res.status(500).json({ success: false, message: "Unknown user role" });
+          db.close();
+        }
+        
+      } catch (bcryptErr) {
+        res.status(500).json({ success: false, message: "Error verifying password" });
+        db.close();
       }
     }
-  )
-})
+  );
+});
 
 app.get('/Customer', (req, res) => {
   const db = new sqlite3.Database('./db/app_database.db');
@@ -75,6 +97,38 @@ app.get('/Customer', (req, res) => {
 
   db.close();
 });
+
+app.post('/register', async (req, res) => {
+  const {
+    name = "",
+    email = "peter@gmail.com",
+    password = "",
+    address = "",
+    phone = "",
+    gender = "",
+    income = 0
+  } = req.body
+
+  try {
+    const userID = await insertCustomer(
+      name,
+      email,
+      password,
+      address,
+      phone,
+      gender,
+      income
+    )
+
+    res.status(201).json({ success: true, message: "Registration successful", user: {userID: userID, role: 'user'}})
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({
+      success: false,
+      error: "Registration failed"
+    })
+  }
+})
 
 app.get("/home", (req, res) => {
     const db = new sqlite3.Database('./db/app_database.db')
@@ -110,41 +164,6 @@ app.get("/home", (req, res) => {
         });
     });
 });
-
-
-
-app.post('/register', async (req, res) => {
-  const {
-    name = "",
-    email = "peter@gmail.com",
-    password = "",
-    address = "",
-    phone = "",
-    gender = "",
-    income = 0
-  } = req.body
-
-  try {
-    await insertCustomer(
-      name,
-      email,
-      password,
-      address,
-      phone,
-      gender,
-      income
-    )
-
-    res.status(201).json({ success: true })
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({
-      success: false,
-      error: "Registration failed"
-    })
-  }
-})
-
 
 app.listen(3000, () => {
     console.log("Server started on port 3000")

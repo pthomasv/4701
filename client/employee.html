@@ -5,15 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <div>WELCOME TO THE HIMLYAYAS!</div>
+    <script>
+      if (localStorage.getItem('role') !== 'empl') {
+        window.location.href = '404.html'
+      }
+    </script>
+</head>
+<body>
     <div>
         <form action="/" method="post">
         <label for="fname">VIN</label>
         <input type="text" id="fvin" name="fvin"><br><br>
         </form>
     </div>
-
-</head>
-<body>
-    
 </body>
 </html>
