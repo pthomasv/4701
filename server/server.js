@@ -76,6 +76,110 @@ app.get('/Customer', (req, res) => {
   db.close();
 });
 
+app.post('/modify', (req, res) => {
+  const { vin, price } = req.body;
+
+  const db = new sqlite3.Database('./db/app_database.db');
+
+  db.run(
+    `UPDATE Vehicle
+     SET price = ?
+     WHERE VIN = ?`,
+    [price, vin],
+    function (err) {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else if (this.changes === 0) {
+        res.status(404).json({ error: "VIN not found" });
+      } else {
+        res.json({
+          success: true,
+          VIN: vin,
+          newPrice: price
+        });
+      }
+    }
+  );
+
+  db.close();
+});
+
+
+app.post('/delete', (req, res) => {
+  const { vin } = req.body;
+
+  const db = new sqlite3.Database('./db/app_database.db');
+
+  db.serialize(() => {
+    //  Delete dependent Options row first
+    db.run(
+      `DELETE FROM Options WHERE VIN = ?`,
+      [vin],
+      function (err) {
+        if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+        }
+
+        db.run(
+          `DELETE FROM Vehicle WHERE VIN = ?`,
+          [vin],
+          function (err) {
+            if (err) {
+              res.status(500).json({ error: err.message });
+            } else if (this.changes === 0) {
+              res.status(404).json({ error: "VIN not found" });
+            } else {
+              res.json({
+                success: true,
+                VIN: vin
+              });
+            }
+          }
+        );
+      }
+    );
+  });
+
+  db.close();
+});
+
+
+app.post('/add', (req, res) => {
+  const { vin, plantID, brandID, color, engine, transmission } = req.body;
+
+  const db = new sqlite3.Database('./db/app_database.db');
+
+  db.serialize(() => {
+    db.run(
+      `INSERT INTO Vehicle (VIN, plantID, brandID)
+       VALUES (?, ?, ?)`,
+      [vin, plantID, brandID],
+      function (err) {
+        if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+        }
+
+        db.run(
+          `INSERT INTO Options (VIN, color, engine, transmission)
+           VALUES (?, ?, ?, ?)`,
+          [vin, color, engine, transmission],
+          function (err) {
+            if (err) {
+              res.status(500).json({ error: err.message });
+            } else {
+              res.json({ success: true, VIN: vin });
+            }
+          }
+        );
+      }
+    );
+  });
+
+  db.close();
+});
+
 app.get("/home", (req, res) => {
     const db = new sqlite3.Database('./db/app_database.db')
     const dealershipsQuery = "SELECT dealerID, name, address FROM Dealership";
