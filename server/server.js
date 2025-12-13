@@ -10,7 +10,7 @@ app.use(cors(corsOptions))
 app.use(express.json())
 
 app.get('/test', (req, res) => {
-    res.json("hello world");
+    res.json("hello worldhh");
 });
 
 /* Login endpoint*/
@@ -75,27 +75,42 @@ app.get('/Customer', (req, res) => {
   db.close();
 });
 
-app.get("/api/dealership/:id", (req, res) => {
-    const id = req.params.id;
+app.get("/home", (req, res) => {
+    const db = new sqlite3.Database('./db/app_database.db')
+    const dealershipsQuery = "SELECT dealerID, name, address FROM Dealership";
+    const vehiclesQuery = "SELECT VIN, model_name, price, dealerID FROM Vehicle";
 
-    const dealershipQuery =
-        "SELECT * FROM Dealership WHERE dealerID = ?";
-    const carsQuery =
-        "SELECT * FROM Cars WHERE dealerID = ?";
+    db.all(dealershipsQuery, [], (err, dealerships) => {
+        if (err) {
+            db.close();
+            return res.status(500).json({ error: err.message });
+        }
 
-    db.get(dealershipQuery, [id], (err, dealer) => {
-        if (err) return res.status(500).json({ error: err });
+        db.all(vehiclesQuery, [], (err, vehicles) => {
+            if (err) {
+                db.close();
+                return res.status(500).json({ error: err.message });
+            }
 
-        db.all(carsQuery, [id], (err, cars) => {
-            if (err) return res.status(500).json({ error: err });
+            const result = dealerships.map(dealer => ({
+                name: dealer.name,
+                address: dealer.address,
+                vehicles: vehicles
+                    .filter(vehicle => vehicle.dealerID === dealer.dealerID)
+                    .map(vehicle => ({
+                        VIN: vehicle.VIN,
+                        model_name: vehicle.model_name,
+                        price: vehicle.price
+                    }))
+            }));
 
-            res.json({
-                dealership: dealer,
-                cars: cars
-            });
+            db.close();
+            res.json(result);
         });
     });
 });
+
+
 
 function redirectCustomer(){
   window.location.href = "customer.html";
