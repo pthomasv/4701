@@ -12,7 +12,7 @@ app.use(cors(corsOptions))
 app.use(express.json())
 
 app.get('/test', (req, res) => {
-    res.json("hello worldhh");
+  res.json("hello worldhh");
 });
 
 /* Login endpoint*/
@@ -110,15 +110,7 @@ app.post('/register', async (req, res) => {
   } = req.body
 
   try {
-    const userID = await insertCustomer(
-      name,
-      email,
-      password,
-      address,
-      phone,
-      gender,
-      income
-    )
+    const userID = await insertCustomer(name, email, password, address, phone, gender, income)
 
     res.status(201).json({ success: true, message: "Registration successful", user: {userID: userID, role: 'user'}})
   } catch (err) {
@@ -131,9 +123,6 @@ app.post('/register', async (req, res) => {
 })
 
 app.post('/purchase', (req, res) => {
-  console.log('=== Purchase Request ===');
-  console.log('Body:', req.body);
-  
   const { VIN, userID, price } = req.body;
   
   if (!VIN || !userID || !price) {
@@ -197,7 +186,9 @@ app.post('/purchase', (req, res) => {
         });
       }
     );
-  });
+  })
+});
+
 app.post('/modify', (req, res) => {
   const { vin, price } = req.body;
 
@@ -340,4 +331,3 @@ app.get("/home", (req, res) => {
 app.listen(3000, () => {
     console.log("Server started on port 3000")
 })
-
