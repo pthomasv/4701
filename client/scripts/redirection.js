@@ -9,7 +9,3 @@ function redirectEmployee(){
 function redirectLogin(){
   window.location.href = "login.html";
 }
-
-function redirectRegister(){
-  window.location.href = "register.html";
-}
